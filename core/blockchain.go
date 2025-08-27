@@ -259,11 +259,6 @@ type BlockChain struct {
 	txLookupLock  sync.RWMutex
 	txLookupCache *lru.Cache[common.Hash, txLookup]
 
-	// This mutex synchronizes access to the unsealed block state.
-	// It protects both the currentUnsealedBlock and unsealedBlockDbState fields
-	// from concurrent access by multiple RPC endpoints.
-	unsealedBlockStateMu sync.RWMutex
-
 	wg            sync.WaitGroup
 	quit          chan struct{} // shutdown signal, closed in Stop.
 	stopping      atomic.Bool   // false if chain is running, true when stopped
@@ -659,19 +654,15 @@ func (bc *BlockChain) SetCurrentUnsealedBlock(block *types.UnsealedBlock) error 
 		return err
 	}
 
-	bc.unsealedBlockStateMu.Lock()
 	bc.unsealedBlockDbState = newState
 	bc.currentUnsealedBlock = block
-	bc.unsealedBlockStateMu.Unlock()
 
 	return nil
 }
 
 func (bc *BlockChain) ResetCurrentUnsealedBlock() {
-	bc.unsealedBlockStateMu.Lock()
 	bc.currentUnsealedBlock = nil
 	bc.unsealedBlockDbState = nil
-	bc.unsealedBlockStateMu.Unlock()
 }
 
 // rewindHashHead implements the logic of rewindHead in the context of hash scheme.

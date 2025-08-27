@@ -63,20 +63,12 @@ func (bc *BlockChain) CurrentSafeBlock() *types.Header {
 }
 
 // CurrentUnsealedBlock returns the current unsealed block.
-// This function is thread-safe and protects against concurrent access to the
-// unsealed block by multiple RPC endpoints.
 func (bc *BlockChain) CurrentUnsealedBlock() *types.UnsealedBlock {
-	bc.unsealedBlockStateMu.RLock()
-	defer bc.unsealedBlockStateMu.RUnlock()
 	return bc.currentUnsealedBlock
 }
 
-// CurrentUnsealedBlockState returns the StateDB for the current unsealed block.
-// This function is thread-safe and protects against concurrent access to the
-// unsealed block state by multiple RPC endpoints.
+// CurrentUnsealedBlockState returns the current unsealed block state.
 func (bc *BlockChain) CurrentUnsealedBlockState() *state.StateDB {
-	bc.unsealedBlockStateMu.RLock()
-	defer bc.unsealedBlockStateMu.RUnlock()
 	return bc.unsealedBlockDbState
 }
 
